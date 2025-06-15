@@ -1,6 +1,7 @@
 package com.zenitron.znt_inbound_api.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,27 @@ import lombok.AllArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonPropertyOrder({
+    "buyer_sku_code",
+    "c_lpn_seq",
+    "c_lpn_uuid",
+    "c_vol_height",
+    "c_vol_length",
+    "c_vol_width",
+    "date_code",
+    "gross_weight",
+    "lot_no",
+    "net_weight",
+    "origin_country_ename",
+    "out_po_line",
+    "out_po_no",
+    "qty",
+    "ref_no",
+    "shipping_mark",
+    "sku_code",
+    "stock_mode",
+    "stock_uuid"
+})
 public class InboundOrderDetail {
 
     @JsonProperty("buyer_sku_code")

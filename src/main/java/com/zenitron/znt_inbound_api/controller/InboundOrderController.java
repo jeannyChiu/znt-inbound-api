@@ -25,6 +25,6 @@ public class InboundOrderController {
     public ResponseEntity<String> receiveInboundOrder(@Valid @RequestBody InboundOrderRequest request) {
         inboundOrderService.processInboundOrder(request);
         // 您可以根據業務需求自訂成功時的回應內容
-        return ResponseEntity.ok("入庫單請求已成功接收");
+        return ResponseEntity.ok("出庫單發運請求已成功接收");
     }
 } 

@@ -1,6 +1,7 @@
 package com.zenitron.znt_inbound_api.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -13,6 +14,14 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonPropertyOrder({
+    "ref_no",
+    "shipped_time",
+    "wms_no",
+    "wms_uuid",
+    "busi_date",
+    "detail"
+})
 public class InboundOrderData {
 
     @NotBlank(message = "ref_no 不得為空")
