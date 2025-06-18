@@ -37,7 +37,7 @@ public class EmailService {
         return "";
     }
 
-    public void sendSignatureErrorEmail(List<String> to, String senderCode, String partnerKey, String calculatedSign, String receivedSign) {
+    public void sendSignatureErrorEmail(List<String> to, String senderCode, String partnerKey, String calculatedSign, String receivedSign, String messageType) {
         if (to == null || to.isEmpty()) {
             logger.warn("簽名驗證失敗，但找不到收件人，不發送郵件。Sender Code: {}", senderCode);
             return;
@@ -48,11 +48,11 @@ public class EmailService {
             message.setFrom(fromEmail);
             message.setTo(to.toArray(new String[0]));
 
-            String subject = String.format("%sReceive [%s] EDI, SHIP key : [%s], sign Issue", getEnvironmentPrefix(), senderCode, partnerKey);
+            String subject = String.format("%sReceive [%s] EDI, %s key : [%s], sign Issue", getEnvironmentPrefix(), senderCode, messageType.toUpperCase(), partnerKey);
             message.setSubject(subject);
 
             String body = String.format(
-                "<<Check Sign>>\n%s\n\n<<JOSN Sign>>\n%s\n\n***EDI系統自動通知請勿回覆!***",
+                "<<Check Sign>>\n%s\n\n<<JSON Sign>>\n%s\n\n***EDI系統自動通知請勿回覆!***",
                 calculatedSign,
                 receivedSign
             );
@@ -66,7 +66,7 @@ public class EmailService {
         }
     }
 
-    public void sendSuccessEmail(List<String> to, String senderCode, String refNo, String wmsNo) {
+    public void sendSuccessEmail(List<String> to, String senderCode, String refNo, String wmsNo, String messageType) {
         if (to == null || to.isEmpty()) {
             logger.warn("資料處理成功，但找不到收件人，不發送成功通知郵件。Sender Code: {}", senderCode);
             return;
@@ -77,7 +77,12 @@ public class EmailService {
             message.setFrom(fromEmail);
             message.setTo(to.toArray(new String[0]));
 
-            String subject = String.format("%sReceive SHIP REF#[%s],WMS_NO#[%s] from [%s]", getEnvironmentPrefix(), refNo, wmsNo, senderCode);
+            String subject;
+            if ("SHIP".equalsIgnoreCase(messageType)) {
+                 subject = String.format("%sReceive SHIP REF#[%s],WMS_NO#[%s] from [%s]", getEnvironmentPrefix(), refNo, wmsNo, senderCode);
+            } else {
+                 subject = String.format("%sReceive REF#[%s],WMS_NO#[%s] from [%s]", getEnvironmentPrefix(), refNo, wmsNo, senderCode);
+            }
             message.setSubject(subject);
 
             String body = "***EDI系統自動通知請勿回覆!***";
