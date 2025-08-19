@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Project Specific ###
+.specstory/
+logs/
+znt-inbound-api.log

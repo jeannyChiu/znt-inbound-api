@@ -69,7 +69,6 @@ public class InboundOrderDetail {
     @JsonProperty("out_po_line")
     private String outPoLine;
 
-    @NotBlank(message = "out_po_no 不得為空")
     @JsonProperty("out_po_no")
     private String outPoNo;
 

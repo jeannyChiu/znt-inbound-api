@@ -121,12 +121,24 @@ public class InboundOrderService {
                     .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
                     .build();
             String dataJson = objectMapper.writeValueAsString(request.getData());
+            
+            // 印出 dataJson 以便檢查
+            logger.info("=== 簽名驗證 Debug 資訊 ===");
+            logger.info("dataJson: {}", dataJson);
+            logger.info("dataJson 長度: {}", dataJson.length());
+            logger.info("partnerKey: {}", partnerKey);
+            
             String stringToSign = dataJson + partnerKey;
+            logger.info("stringToSign 長度: {}", stringToSign.length());
 
             // 1. 計算 MD5 並取得其 32 字元的十六進位字串
             String md5Hex = DigestUtils.md5Hex(stringToSign);
+            logger.info("MD5 Hex: {}", md5Hex);
+            
             // 2. 將該十六進位字串進行 Base64 編碼
             String calculatedSignature = Base64.encodeBase64String(md5Hex.getBytes(StandardCharsets.UTF_8));
+            logger.info("計算出的簽名: {}", calculatedSignature);
+            logger.info("收到的簽名: {}", request.getSign());
 
             if (!calculatedSignature.equals(request.getSign())) {
                 logger.warn("簽名驗證失敗。part_code: {}, 傳入簽名: {}, 計算後簽名: {}", partCode, request.getSign(), calculatedSignature);
