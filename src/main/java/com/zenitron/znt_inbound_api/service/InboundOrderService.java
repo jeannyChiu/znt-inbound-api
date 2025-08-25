@@ -83,7 +83,19 @@ public class InboundOrderService {
 
         // 發送成功通知郵件
         List<String> recipients = partnerKeyRepository.findRecipientsBySenderCode(senderCode);
-        emailService.sendSuccessEmail(recipients, senderCode, data.getRefNo(), data.getWmsNo(), "SHIP");
+        
+        // 準備完整的請求 JSON 和回應 JSON
+        String requestJson = null;
+        String responseJson = "出庫單發運請求已成功接收";
+        try {
+            ObjectMapper fullMapper = new ObjectMapper();
+            requestJson = fullMapper.writeValueAsString(request);
+        } catch (Exception e) {
+            logger.error("無法序列化請求為 JSON", e);
+            requestJson = "JSON 序列化失敗: " + e.getMessage();
+        }
+        
+        emailService.sendSuccessEmail(recipients, senderCode, data.getRefNo(), data.getWmsNo(), "SHIP", requestJson, responseJson);
 
         logger.debug("完整請求內容: {}", request);
     }
@@ -146,13 +158,27 @@ public class InboundOrderService {
                 // 當簽名驗證失敗時，發送 Email 通知
                 partnerKeyRepository.findSenderCodeByPartCode(partCode).ifPresent(senderCode -> {
                     List<String> recipients = partnerKeyRepository.findRecipientsBySenderCode(senderCode);
+                    
+                    // 準備完整的請求 JSON 和回應 JSON
+                    String requestJson = null;
+                    String responseJson = "簽名驗證失敗";
+                    try {
+                        ObjectMapper fullMapper = new ObjectMapper();
+                        requestJson = fullMapper.writeValueAsString(request);
+                    } catch (Exception e) {
+                        logger.error("無法序列化請求為 JSON", e);
+                        requestJson = "JSON 序列化失敗: " + e.getMessage();
+                    }
+                    
                     emailService.sendSignatureErrorEmail(
                         recipients,
                         senderCode,
                         partnerKey,
                         calculatedSignature,
                         request.getSign(),
-                        "SHIP"
+                        "SHIP",
+                        requestJson,
+                        responseJson
                     );
                 });
                 

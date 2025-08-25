@@ -37,7 +37,7 @@ public class EmailService {
         return "";
     }
 
-    public void sendSignatureErrorEmail(List<String> to, String senderCode, String partnerKey, String calculatedSign, String receivedSign, String messageType) {
+    public void sendSignatureErrorEmail(List<String> to, String senderCode, String partnerKey, String calculatedSign, String receivedSign, String messageType, String requestJson, String responseJson) {
         if (to == null || to.isEmpty()) {
             logger.warn("簽名驗證失敗，但找不到收件人，不發送郵件。Sender Code: {}", senderCode);
             return;
@@ -52,9 +52,11 @@ public class EmailService {
             message.setSubject(subject);
 
             String body = String.format(
-                "<<Check Sign>>\n%s\n\n<<JSON Sign>>\n%s\n\n***EDI系統自動通知請勿回覆!***",
+                "<<Check Sign>>\n%s\n\n<<JSON Sign>>\n%s\n\n<<Request JSON>>\n%s\n\n<<Response JSON>>\n%s\n\n***EDI系統自動通知請勿回覆!***",
                 calculatedSign,
-                receivedSign
+                receivedSign,
+                requestJson != null ? requestJson : "N/A",
+                responseJson != null ? responseJson : "N/A"
             );
             message.setText(body);
 
@@ -66,7 +68,7 @@ public class EmailService {
         }
     }
 
-    public void sendSuccessEmail(List<String> to, String senderCode, String refNo, String wmsNo, String messageType) {
+    public void sendSuccessEmail(List<String> to, String senderCode, String refNo, String wmsNo, String messageType, String requestJson, String responseJson) {
         if (to == null || to.isEmpty()) {
             logger.warn("資料處理成功，但找不到收件人，不發送成功通知郵件。Sender Code: {}", senderCode);
             return;
@@ -85,7 +87,11 @@ public class EmailService {
             }
             message.setSubject(subject);
 
-            String body = "***EDI系統自動通知請勿回覆!***";
+            String body = String.format(
+                "<<Request JSON>>\n%s\n\n<<Response JSON>>\n%s\n\n***EDI系統自動通知請勿回覆!***",
+                requestJson != null ? requestJson : "N/A",
+                responseJson != null ? responseJson : "N/A"
+            );
             message.setText(body);
 
             mailSender.send(message);

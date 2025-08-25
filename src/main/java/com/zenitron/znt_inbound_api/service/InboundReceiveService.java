@@ -82,7 +82,19 @@ public class InboundReceiveService {
 
         // 發送成功通知郵件
         List<String> recipients = partnerKeyRepository.findRecipientsBySenderCode(senderCode);
-        emailService.sendSuccessEmail(recipients, senderCode, data.getRefNo(), data.getWmsNo(), "RECEIVE");
+        
+        // 準備完整的請求 JSON 和回應 JSON
+        String requestJson = null;
+        String responseJson = "收貨數據回傳請求已成功接收";
+        try {
+            ObjectMapper fullMapper = new ObjectMapper();
+            requestJson = fullMapper.writeValueAsString(request);
+        } catch (Exception e) {
+            logger.error("無法序列化請求為 JSON", e);
+            requestJson = "JSON 序列化失敗: " + e.getMessage();
+        }
+        
+        emailService.sendSuccessEmail(recipients, senderCode, data.getRefNo(), data.getWmsNo(), "RECEIVE", requestJson, responseJson);
 
         logger.debug("完整請求內容: {}", request);
     }
@@ -129,13 +141,27 @@ public class InboundReceiveService {
 
                 partnerKeyRepository.findSenderCodeByPartCode(partCode).ifPresent(senderCode -> {
                     List<String> recipients = partnerKeyRepository.findRecipientsBySenderCode(senderCode);
+                    
+                    // 準備完整的請求 JSON 和回應 JSON
+                    String requestJson = null;
+                    String responseJson = "簽名驗證失敗";
+                    try {
+                        ObjectMapper fullMapper = new ObjectMapper();
+                        requestJson = fullMapper.writeValueAsString(request);
+                    } catch (Exception e) {
+                        logger.error("無法序列化請求為 JSON", e);
+                        requestJson = "JSON 序列化失敗: " + e.getMessage();
+                    }
+                    
                     emailService.sendSignatureErrorEmail(
                         recipients,
                         senderCode,
                         partnerKey,
                         calculatedSignature,
                         request.getSign(),
-                        "RECEIVE"
+                        "RECEIVE",
+                        requestJson,
+                        responseJson
                     );
                 });
                 
